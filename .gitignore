@@ -32,3 +32,5 @@
 
 /vendor/cache
 
+# Ignore newrelic configuration
+/config/newrelic.yml
