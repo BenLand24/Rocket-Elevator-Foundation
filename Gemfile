@@ -111,3 +111,4 @@ gem 'dropbox_api'
 gem "active_material", github: "vigetlabs/active_material"
 gem "recaptcha", require: "recaptcha/rails"
 gem 'better_errors', '~> 2.5', '>= 2.5.1'
+gem 'newrelic_rpm'
