@@ -42,51 +42,32 @@ class InterventionsController < ApplicationController
 
 
   def create_intervention
-    intervention = Intervention.new(intervention_params)
-    #   params["intervention"].delete("column_id") if params["intervention"]["column_id"] == nil
-    #   params["intervention"].delete("elevator_id") if params["intervention"]["elevator_id"] == nil
-    #   attributes = params[:intervention].permit!
-      puts current_user
-      puts author_id
-    #   employee = current_user.employee_id
-      
-    #   intervention[:author_id] = current_user.employee_id
-      
-    #   intervention = Intervention.new(attributes)
-    #   intervention.save!
-
-    if intervention.save
-        flash[:notice] = "Successfull"
-        redirect_to :index
+    @intervention = Intervention.new(intervention_params)
+    
+    if @intervention.save
+      flash[:notice] = "add new intervention successful"
+      redirect_to :root
     else
-        flash[:notice] = "Failed"
-        redirect_to action:"new"
+      logger.error "failed to save intervention, missing params"
+      flash[:notice] = "add new intervention not successful"
+      redirect_to action:"new"
     end
-
-    #   intervention_ticket(intervention)
-  end 
-
-  def intervention_ticket(intervention)
-
-      comment = { :value => "Intervention ticket author: #{current_user.first_name} #{current_user.last_name}
-      \n \n Client: #{intervention.customer.company_name} 
-      \n \n Building #: #{intervention.building.id}   (#{intervention.building.company_name})
-      \n \n Battery #: #{intervention.battery.id} 
-      \n \n Column #: #{intervention.column ? intervention.column.id : "N/Ap"} 
-      \n \n Elevator shaft #: #{intervention.elevator ? intervention.elevator.id : "N/Ap"} 
-      \n \n Intervention assigned to: #{intervention.employee ? intervention.employee.first_name : "None"} #{intervention.employee ? intervention.employee.last_name : ""} 
-      \n \n Intervention description: \n #{intervention.report} "}
-
-      ticket = ZendeskAPI::Ticket.new($client, :type => "support", :priority => "urgent",
-      :subject => "Intervention ticket for the #{intervention.customer.company_name} building",
-      :comment => comment
-      )
-
-      ticket.save!
   end
+
   private
   def intervention_params
-    #params.require(name model)
-    params.require(:intervention).permit(:author_id,:customer_id,:building_id,:battery_id,:column_id,:elevator_id,:employee_id,:interventionStartTime,:interventionEndTime,:result,:report)
+    params[:intervention][:author_id] = current_user.id
+    if params[:intervention][:column_id] == "nulltest"
+      params[:intervention][:column_id] = nil
+    end
+    if params[:intervention][:elevator_id] == "nulltest"
+      params[:intervention][:elevator_id] = nil
+    end
+    if params[:intervention][:employee_id] == "None"
+      params[:intervention][:employee_id] = nil
+    end
+    # params[:intervention][:result] = nil
+    # params[:intervention][:status] = nil
+    params.require(:intervention).permit(:customer_id, :employee_id, :building_id, :battery_id, :column_id, :elevator_id, :report, :author_id, :date_started, :date_ended, :result, :status)
   end
 end
